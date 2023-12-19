@@ -78,18 +78,6 @@ app.post("/submitData", (req, res) => {
 });
 
 // Search data endpoint
-// app.get("/searchData", (req, res) => {
-// 	const searchData = req.query.search;
-// 	const userData = req.cookies.userData || "";
-
-// 	if (userData.includes(searchData)) {
-// 		res.status(200).json({ data: userData });
-// 	} else {
-// 		res.status(404).json({ message: "No matching data found" });
-// 	}
-// });
-
-// Search data endpoint
 app.get("/searchData", (req, res) => {
 	const searchData = req.query.search;
 	let userData = req.cookies.userData || "[]"; // Retrieve existing data or initialize an empty array if none exists

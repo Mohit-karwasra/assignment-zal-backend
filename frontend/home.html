@@ -6,10 +6,10 @@
 	<body>
 		<h1>Home Page</h1>
 		<label>Submit text message</label><br /><br />
-		<input type="text" id="input1" placeholder="Input 1" /><br /><br />
+		<input type="text" id="input1" value="" placeholder="Input 1" /><br /><br />
 		<button onclick="submitData()">Submit Data</button><br /><br />
 		<label>Search text message</label><br /><br />
-		<input type="text" id="input2" placeholder="Input 2" /><br /><br />
+		<input type="text" id="input2" value="" placeholder="Input 2" /><br /><br />
 		<button onclick="searchData()">Search Data</button><br /><br />
 		<label>Show searched text messages here</label><br /><br />
 		<div
@@ -22,9 +22,11 @@
 
 		<script>
 			const searchResults = document.getElementById("search-results");
+			const input1 = document.getElementById("input1");
+			const input2 = document.getElementById("input2");
 			// Functions to handle button actions
 			function submitData() {
-				const data = document.getElementById("input1").value;
+				const data = input1.value;
 				fetch("/submitData", {
 					method: "POST",
 					headers: {
@@ -40,33 +42,18 @@
 						}
 					})
 					.then((data) => {
+						input1.value = "";
+						input2.value = "";
+						searchResults.innerHTML = "";
 						alert(data.message);
-						// Optionally, update the UI or perform additional actions upon successful submission
 					})
 					.catch((error) => {
 						alert("Error submitting data: " + error.message);
 					});
 			}
 
-			// function searchData() {
-			// 	const search = document.getElementById("input2").value;
-			// 	fetch(`/searchData?search=${search}`)
-			// 		.then((response) => {
-			// 			if (response.ok) {
-			// 				return response.json();
-			// 			} else {
-			// 				throw new Error("No matching data found");
-			// 			}
-			// 		})
-			// 		.then((data) => {
-			// 			console.log(data.data);
-			// 			searchResults.innerText.append(data.data);
-			// 			alert(`Matching data found: ${data.data}`);
-			// 		})
-			// 		.catch((error) => alert(error.message));
-			// }
 			function searchData() {
-				const search = document.getElementById("input2").value;
+				const search = input2.value;
 				fetch(`/searchData?search=${search}`)
 					.then((response) => {
 						if (response.ok) {
@@ -94,6 +81,9 @@
 				fetch("/clearCookie")
 					.then((response) => response.json())
 					.then((data) => {
+						input1.value = "";
+						input2.value = "";
+						searchResults.innerHTML = "";
 						alert(data.message);
 					});
 			}
