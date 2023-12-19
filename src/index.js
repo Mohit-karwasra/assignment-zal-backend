@@ -103,7 +103,9 @@ app.get("/searchData", (req, res) => {
 		}
 
 		// Perform search logic here with searchData and userData
-		const matchingData = userData.filter((item) => item.includes(searchData));
+		const matchingData = userData.filter((item) =>
+			item.toLowerCase().includes(searchData.toLowerCase())
+		);
 
 		if (matchingData.length > 0) {
 			res.status(200).json({ data: matchingData });
