@@ -14,13 +14,14 @@
 		<label>Show searched text messages here</label><br /><br />
 		<div
 			style="width: 500px; height: 400px; border: 1px solid black"
-			class="search-results"
+			id="search-results"
 			placeholder="search results"
 		></div>
 		<button onclick="clearCookie()">Clear Cookie</button><br /><br />
 		<button onclick="logout()">Logout</button>
 
 		<script>
+			const searchResults = document.getElementById("search-results");
 			// Functions to handle button actions
 			function submitData() {
 				const data = document.getElementById("input1").value;
@@ -31,10 +32,39 @@
 					},
 					body: JSON.stringify({ data }),
 				})
-					.then((response) => response.json())
-					.then((data) => alert(data.message));
+					.then((response) => {
+						if (response.ok) {
+							return response.json();
+						} else {
+							throw new Error("Failed to submit data");
+						}
+					})
+					.then((data) => {
+						alert(data.message);
+						// Optionally, update the UI or perform additional actions upon successful submission
+					})
+					.catch((error) => {
+						alert("Error submitting data: " + error.message);
+					});
 			}
 
+			// function searchData() {
+			// 	const search = document.getElementById("input2").value;
+			// 	fetch(`/searchData?search=${search}`)
+			// 		.then((response) => {
+			// 			if (response.ok) {
+			// 				return response.json();
+			// 			} else {
+			// 				throw new Error("No matching data found");
+			// 			}
+			// 		})
+			// 		.then((data) => {
+			// 			console.log(data.data);
+			// 			searchResults.innerText.append(data.data);
+			// 			alert(`Matching data found: ${data.data}`);
+			// 		})
+			// 		.catch((error) => alert(error.message));
+			// }
 			function searchData() {
 				const search = document.getElementById("input2").value;
 				fetch(`/searchData?search=${search}`)
@@ -46,6 +76,15 @@
 						}
 					})
 					.then((data) => {
+						console.log(data.data);
+						// Update UI with search results (replace the existing content)
+						const searchResults = document.getElementById("search-results");
+						searchResults.innerHTML = ""; // Clear existing content
+						data.data.forEach((item) => {
+							const newItem = document.createElement("div");
+							newItem.textContent = item;
+							searchResults.appendChild(newItem);
+						});
 						alert(`Matching data found: ${data.data}`);
 					})
 					.catch((error) => alert(error.message));

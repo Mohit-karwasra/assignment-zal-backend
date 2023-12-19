@@ -51,23 +51,68 @@ app.post("/login", (req, res) => {
 // Home Page -2 endpoints
 app.use(authenticateUser); // Apply authentication middleware
 
+// Error handling middleware
+// app.use((err, req, res, next) => {
+// 	console.error(err.stack);
+// 	res.status(500).send(`Something went wrong! ${err.message}`); // Include error message for debugging
+// });
+
 // Submit data endpoint
 app.post("/submitData", (req, res) => {
-	const data = req.body.data;
-	// Store data in cookie
-	res.cookie("userData", data);
+	const newData = req.body.data;
+	let userData = req.cookies.userData || "[]"; // Retrieve existing data or initialize an empty array if none exists
+
+	try {
+		// Try parsing the retrieved data from the cookie as an array
+		userData = JSON.parse(userData);
+	} catch (error) {
+		// Handle parsing error (e.g., invalid JSON string in the cookie)
+		console.error("Error parsing userData from cookie:", error);
+		userData = []; // Reset to an empty array
+	}
+
+	userData.push(newData);
+
+	res.cookie("userData", JSON.stringify(userData)); // Store as a JSON string in the cookie
 	res.status(200).json({ message: "Data submitted successfully" });
 });
 
 // Search data endpoint
+// app.get("/searchData", (req, res) => {
+// 	const searchData = req.query.search;
+// 	const userData = req.cookies.userData || "";
+
+// 	if (userData.includes(searchData)) {
+// 		res.status(200).json({ data: userData });
+// 	} else {
+// 		res.status(404).json({ message: "No matching data found" });
+// 	}
+// });
+
+// Search data endpoint
 app.get("/searchData", (req, res) => {
 	const searchData = req.query.search;
-	const userData = req.cookies.userData || "";
+	let userData = req.cookies.userData || "[]"; // Retrieve existing data or initialize an empty array if none exists
 
-	if (userData.includes(searchData)) {
-		res.status(200).json({ data: userData });
-	} else {
-		res.status(404).json({ message: "No matching data found" });
+	try {
+		// Try parsing the retrieved data from the cookie as an array
+		userData = JSON.parse(userData);
+
+		if (!Array.isArray(userData)) {
+			throw new Error("userData is not an array");
+		}
+
+		// Perform search logic here with searchData and userData
+		const matchingData = userData.filter((item) => item.includes(searchData));
+
+		if (matchingData.length > 0) {
+			res.status(200).json({ data: matchingData });
+		} else {
+			res.status(404).json({ message: "No matching data found" });
+		}
+	} catch (error) {
+		console.error("Error handling userData from cookie:", error);
+		res.status(500).json({ message: "Error processing data" });
 	}
 });
 
