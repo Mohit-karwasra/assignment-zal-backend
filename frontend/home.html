@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Home</title>
+	</head>
+	<body>
+		<h1>Home Page</h1>
+		<label>Submit text message</label><br /><br />
+		<input type="text" id="input1" placeholder="Input 1" /><br /><br />
+		<button onclick="submitData()">Submit Data</button><br /><br />
+		<label>Search text message</label><br /><br />
+		<input type="text" id="input2" placeholder="Input 2" /><br /><br />
+		<button onclick="searchData()">Search Data</button><br /><br />
+		<label>Show searched text messages here</label><br /><br />
+		<div
+			style="width: 500px; height: 400px; border: 1px solid black"
+			class="search-results"
+			placeholder="search results"
+		></div>
+		<button onclick="clearCookie()">Clear Cookie</button><br /><br />
+		<button onclick="logout()">Logout</button>
+
+		<script>
+			// Functions to handle button actions
+			function submitData() {
+				const data = document.getElementById("input1").value;
+				fetch("/submitData", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ data }),
+				})
+					.then((response) => response.json())
+					.then((data) => alert(data.message));
+			}
+
+			function searchData() {
+				const search = document.getElementById("input2").value;
+				fetch(`/searchData?search=${search}`)
+					.then((response) => {
+						if (response.ok) {
+							return response.json();
+						} else {
+							throw new Error("No matching data found");
+						}
+					})
+					.then((data) => {
+						alert(`Matching data found: ${data.data}`);
+					})
+					.catch((error) => alert(error.message));
+			}
+
+			function clearCookie() {
+				fetch("/clearCookie")
+					.then((response) => response.json())
+					.then((data) => {
+						alert(data.message);
+					});
+			}
+
+			function logout() {
+				fetch("/logout").then(() => {
+					window.location.href = "/login.html";
+				});
+			}
+		</script>
+	</body>
+</html>
